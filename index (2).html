@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jianghu Quiz · Omegaverse</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+/* ═══ THEME VARIABLES ═══ */
+:root {
+  /* Dark mode (default) */
+  --bg:          #03050f;
+  --bg-card:     #060d1c;
+  --bg-opt-sel:  rgba(42,80,153,.12);
+  --bg-srow:     #090f1e;
+  --border-card: #0e2040;
+  --border-opt:  #0e2244;
+  --border-brk:  #1e4278;
+  --border-btn:  #1e4278;
+  --border-prog: #0c1830;
+  --text-body:   #c8dcf8;
+  --text-h1:     #eef4ff;
+  --text-q:      #dce8ff;
+  --text-tag:    #5a8fd4;
+  --text-sub:    #506888;
+  --text-meta:   #3a5880;
+  --text-label:  #4a70b8;
+  --text-opt:    #6a8ab8;
+  --text-opt-hv: #a0c0e8;
+  --text-opt-sl: #ccdeff;
+  --text-glyph:  #2e5090;
+  --text-glyph-a:#7aaae4;
+  --text-btn:    #5a90e4;
+  --text-btn-hv: #90c0ff;
+  --text-desc:   #7a9ab8;
+  --text-res-sub:#4a6888;
+  --text-scores: #2e4870;
+  --text-srow:   #3a5878;
+  --text-sval:   #3a5878;
+  --text-again:  #4a70b8;
+  --text-again-hv:#8abcee;
+  --shadow-card: 0 4px 40px rgba(0,0,0,.8);
+  --shadow-res:  0 0 80px rgba(0,0,0,.9);
+  --prog-dot-bg: #03050f;
+  --star-color:  160,200,255;
+}
+
+html.light {
+  --bg:          #f0ede6;
+  --bg-card:     #faf8f4;
+  --bg-opt-sel:  rgba(80,60,20,.08);
+  --bg-srow:     #e8e4dc;
+  --border-card: #ccc4b0;
+  --border-opt:  #d0c8b8;
+  --border-brk:  #a89070;
+  --border-btn:  #a89070;
+  --border-prog: #ddd6c8;
+  --text-body:   #2c2414;
+  --text-h1:     #120e06;
+  --text-q:      #180e04;
+  --text-tag:    #5a4828;
+  --text-sub:    #6a5840;
+  --text-meta:   #7a6a50;
+  --text-label:  #5a4828;
+  --text-opt:    #584838;
+  --text-opt-hv: #2a1e08;
+  --text-opt-sl: #120e04;
+  --text-glyph:  #a08858;
+  --text-glyph-a:#6a5020;
+  --text-btn:    #4a3818;
+  --text-btn-hv: #1e1406;
+  --text-desc:   #484030;
+  --text-res-sub:#706050;
+  --text-scores: #706050;
+  --text-srow:   #706050;
+  --text-sval:   #706050;
+  --text-again:  #5a4828;
+  --text-again-hv:#1e1406;
+  --shadow-card: 0 4px 24px rgba(0,0,0,.10);
+  --shadow-res:  0 0 40px rgba(0,0,0,.12);
+  --prog-dot-bg: #f0ede6;
+  --star-color:  100,80,40;
+}
+
+/* ═══ THEME TRANSITION ═══ */
+body, .card, .res-card, .opt, .btn-go, .btn-again {
+  transition: background-color .35s ease, border-color .35s ease, color .35s ease, box-shadow .35s ease;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-body);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ═══ THEME TOGGLE ═══ */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 22px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-btn);
+  border-radius: 3px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: border-color .2s, background .35s, transform .15s;
+}
+.theme-toggle:hover {
+  border-color: var(--text-btn);
+  transform: translateY(-1px);
+}
+.theme-toggle-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+.theme-toggle-label {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 7px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-btn);
+}
+
+/* ═══ CANVAS STAR BG ═══ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ═══ LAYOUT ═══ */
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 22px 100px;
+}
+
+/* ═══ HERO ═══ */
+.hero {
+  text-align: center;
+  padding: 70px 0 48px;
+}
+.hero-tag {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: var(--text-tag);
+  margin-bottom: 22px;
+  opacity: 0;
+  animation: up .8s ease .1s forwards;
+}
+.hero-kanji {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(42px,12vw,82px);
+  letter-spacing: 14px;
+  line-height: 1;
+  margin-bottom: 20px;
+  background: linear-gradient(100deg, #4a7fd4 0%, #7ab4e8 30%, #c8e0ff 50%, #7ab4e8 70%, #8870d8 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 28px rgba(74,127,212,.5));
+  opacity: 0;
+  animation: up 1s ease .25s forwards, shimmer 5s linear 1.5s infinite;
+}
+html.light .hero-kanji {
+  background: linear-gradient(100deg, #6a4a10 0%, #9a7030 30%, #d4a850 50%, #9a7030 70%, #7a5a30 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 18px rgba(120,80,20,.3));
+}
+.hero-rule {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 300px;
+  margin: 0 auto 20px;
+  opacity: 0;
+  animation: up .7s ease .4s forwards;
+}
+.hero-rule::before,.hero-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--text-label), transparent);
+}
+.hero-diamond {
+  width: 6px; height: 6px;
+  border: 1px solid var(--text-btn);
+  transform: rotate(45deg);
+  animation: spin 8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(405deg); } }
+
+.hero-h1 {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(16px,4.5vw,27px);
+  font-weight: 700;
+  color: var(--text-h1);
+  line-height: 1.35;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: up .9s ease .55s forwards;
+}
+.hero-sub {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--text-sub);
+  opacity: 0;
+  animation: up .7s ease .7s forwards;
+}
+
+/* ═══ PROGRESS ═══ */
+.prog {
+  margin-bottom: 26px;
+  opacity: 0;
+  animation: up .6s ease .85s forwards;
+}
+.prog-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-meta);
+  margin-bottom: 9px;
+}
+.prog-track {
+  height: 1px;
+  background: var(--border-prog);
+  position: relative;
+}
+.prog-bar {
+  height: 1px;
+  width: 0%;
+  background: linear-gradient(90deg, #2a5099, #7ab4e8);
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+.prog-bar::after {
+  content: '';
+  position: absolute;
+  right: -4px; top: -4px;
+  width: 9px; height: 9px;
+  border: 1px solid #4a7fd4;
+  background: var(--prog-dot-bg);
+  transform: rotate(45deg);
+  transition: opacity .3s, background .35s;
+}
+
+/* ═══ CARD ═══ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 4px;
+  padding: 38px 32px 30px;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(74,127,212,.04),
+    var(--shadow-card),
+    inset 0 1px 0 rgba(74,127,212,.04);
+  opacity: 0;
+}
+.card.init { animation: up .7s ease 1s forwards; }
+/* bracket corners */
+.card::before, .card::after,
+.card .c2::before, .card .c2::after {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+}
+.card::before  { top:0;    left:0;  border-top:1px solid var(--border-brk);  border-left:1px solid var(--border-brk); }
+.card::after   { top:0;    right:0; border-top:1px solid var(--border-brk);  border-right:1px solid var(--border-brk); }
+.card .c2::before { bottom:0; left:0;  border-bottom:1px solid var(--border-brk); border-left:1px solid var(--border-brk); }
+.card .c2::after  { bottom:0; right:0; border-bottom:1px solid var(--border-brk); border-right:1px solid var(--border-brk); }
+
+.q-label {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 5px;
+  color: var(--text-label);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: block;
+}
+.q-text {
+  font-size: clamp(18px,2.8vw,22px);
+  font-weight: 600;
+  line-height: 1.75;
+  color: var(--text-q);
+  margin-bottom: 28px;
+  padding-left: 18px;
+  border-left: 2px solid var(--border-brk);
+  letter-spacing: 0.01em;
+}
+
+/* ═══ OPTIONS ═══ */
+.opts { display: flex; flex-direction: column; gap: 9px; }
+
+.opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 18px;
+  background: transparent;
+  border: 1px solid var(--border-opt);
+  border-radius: 3px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  color: var(--text-opt);
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s, color .2s, transform .15s, background .35s;
+}
+.opt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(74,127,212,.07) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity .25s;
+}
+html.light .opt::before {
+  background: linear-gradient(90deg, rgba(100,80,20,.06) 0%, transparent 100%);
+}
+.opt:hover {
+  border-color: var(--border-brk);
+  color: var(--text-opt-hv);
+  transform: translateX(3px);
+}
+.opt:hover::before { opacity: 1; }
+
+.opt.sel {
+  border-color: var(--text-label);
+  color: var(--text-opt-sl);
+  background: var(--bg-opt-sel);
+  box-shadow: -2px 0 0 var(--text-label), 0 0 24px rgba(42,80,153,.08);
+}
+.opt.sel::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--text-btn);
+  border-radius: 3px;
+  animation: ping .45s ease forwards;
+}
+@keyframes ping {
+  from { opacity:1; transform:scale(1); }
+  to   { opacity:0; transform:scale(1.02); }
+}
+
+.opt-g {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px;
+  color: var(--text-glyph);
+  width: 22px;
+  flex-shrink: 0;
+  text-align: center;
+  transition: color .2s;
+  line-height: 1.3;
+}
+.opt:hover .opt-g,
+.opt.sel .opt-g { color: var(--text-glyph-a); }
+
+.opt-t {
+  font-size: 16px;
+  line-height: 1.75;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+/* ═══ NAV ═══ */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-opt);
+}
+.btn-go {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 13px 30px;
+  background: transparent;
+  border: 1px solid var(--border-btn);
+  color: var(--text-btn);
+  cursor: pointer;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s, color .2s, transform .15s, box-shadow .2s, background .35s;
+}
+.btn-go::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(42,80,153,.3) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity .25s;
+}
+html.light .btn-go::before {
+  background: linear-gradient(135deg, rgba(100,80,20,.12) 0%, transparent 100%);
+}
+.btn-go:not(:disabled):hover {
+  border-color: var(--text-btn);
+  color: var(--text-btn-hv);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(42,80,153,.15);
+}
+html.light .btn-go:not(:disabled):hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+}
+.btn-go:not(:disabled):hover::before { opacity: 1; }
+.btn-go:not(:disabled):active { transform: translateY(0); }
+.btn-go:disabled { opacity: .25; cursor: not-allowed; }
+
+/* ═══ RESULT ═══ */
+#res-section { display: none; }
+
+.res-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 4px;
+  padding: 54px 36px 46px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-res);
+  animation: up .9s ease forwards;
+  transition: background .35s, border-color .35s, box-shadow .35s;
+}
+.res-card::before, .res-card::after,
+.res-card .rc2::before, .res-card .rc2::after {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+}
+.res-card::before  { top:0;    left:0;  border-top:1px solid var(--border-brk);  border-left:1px solid var(--border-brk); }
+.res-card::after   { top:0;    right:0; border-top:1px solid var(--border-brk);  border-right:1px solid var(--border-brk); }
+.res-card .rc2::before { bottom:0; left:0;  border-bottom:1px solid var(--border-brk); border-left:1px solid var(--border-brk); }
+.res-card .rc2::after  { bottom:0; right:0; border-bottom:1px solid var(--border-brk); border-right:1px solid var(--border-brk); }
+
+.res-card .glow-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.res-card .glow-orb {
+  position: absolute;
+  top: -80px; left: 50%;
+  transform: translateX(-50%);
+  width: 340px; height: 220px;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity .35s;
+}
+html.light .res-card .glow-orb { opacity: .35; }
+
+.res-eye {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--text-res-sub);
+  margin-bottom: 16px;
+  margin-top: 10px;
+  position: relative; z-index:1;
+}
+.res-role {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(22px,6vw,40px);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  position: relative; z-index:1;
+}
+.res-role.alpha { color:#d45a5a; text-shadow:0 0 30px rgba(196,74,74,.4); }
+.res-role.beta  { color:#4a7fd4; text-shadow:0 0 30px rgba(74,127,212,.4); }
+.res-role.omega { color:#9a5fd4; text-shadow:0 0 30px rgba(154,95,212,.4); }
+html.light .res-role.alpha { color:#b83030; text-shadow:0 0 20px rgba(180,50,50,.2); }
+html.light .res-role.beta  { color:#2a5fa8; text-shadow:0 0 20px rgba(42,95,168,.2); }
+html.light .res-role.omega { color:#7040b0; text-shadow:0 0 20px rgba(112,64,176,.2); }
+
+.res-sub {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text-res-sub);
+  letter-spacing: 2px;
+  margin-bottom: 26px;
+  position: relative; z-index:1;
+}
+
+.res-div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 160px;
+  margin: 0 auto 26px;
+  position: relative; z-index:1;
+}
+.res-div::before,.res-div::after { content:''; flex:1; height:1px; }
+.res-div-dot { width:5px; height:5px; border:1px solid; transform:rotate(45deg); flex-shrink:0; }
+
+.res-card.alpha .res-div::before,.res-card.alpha .res-div::after { background:rgba(196,74,74,.35); }
+.res-card.alpha .res-div-dot  { border-color:#d45a5a; }
+.res-card.beta  .res-div::before,.res-card.beta  .res-div::after { background:rgba(74,127,212,.35); }
+.res-card.beta  .res-div-dot  { border-color:#4a7fd4; }
+.res-card.omega .res-div::before,.res-card.omega .res-div::after { background:rgba(154,95,212,.35); }
+.res-card.omega .res-div-dot  { border-color:#9a5fd4; }
+
+.res-desc {
+  font-size: 17px;
+  line-height: 2.0;
+  color: var(--text-desc);
+  text-align: left;
+  font-style: italic;
+  margin-bottom: 28px;
+  position: relative; z-index:1;
+  letter-spacing: 0.01em;
+}
+
+.res-traits {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 34px;
+  position: relative; z-index:1;
+}
+.trait {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid;
+  border-radius: 2px;
+}
+.res-card.alpha .trait { color:#d45a5a; border-color:rgba(196,74,74,.25); }
+.res-card.beta  .trait { color:#4a7fd4; border-color:rgba(74,127,212,.25); }
+.res-card.omega .trait { color:#9a5fd4; border-color:rgba(154,95,212,.25); }
+html.light .res-card.alpha .trait { color:#b83030; border-color:rgba(180,50,50,.3); }
+html.light .res-card.beta  .trait { color:#2a5fa8; border-color:rgba(42,95,168,.3); }
+html.light .res-card.omega .trait { color:#7040b0; border-color:rgba(112,64,176,.3); }
+
+/* score bars */
+.scores { margin-bottom:32px; position:relative; z-index:1; }
+.scores-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 8px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--text-scores);
+  margin-bottom: 14px;
+  text-align: center;
+}
+.srow { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.srow-name { width:140px; font-size:12px; color:var(--text-srow); flex-shrink:0; text-align:right; letter-spacing:0.02em; }
+.srow-track { flex:1; height:3px; background:var(--bg-srow); border-radius:2px; overflow:hidden; }
+.srow-bar { height:100%; width:0%; border-radius:2px; transition:width 1s cubic-bezier(.4,0,.2,1); }
+.srow-val { width:30px; font-size:12px; color:var(--text-sval); }
+
+/* watermark */
+.wm {
+  position:absolute; bottom:18px; right:22px;
+  font-family:'Noto Serif SC',serif;
+  font-size:60px; line-height:1;
+  opacity:.04; color:currentColor;
+  pointer-events:none; user-select:none; z-index:0;
+}
+
+.btn-again {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 12px 26px;
+  background: transparent;
+  border: 1px solid var(--border-btn);
+  color: var(--text-again);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: border-color .2s, color .2s, transform .15s, background .35s;
+  position: relative; z-index:1;
+}
+.btn-again:hover { border-color:var(--text-btn); color:var(--text-again-hv); transform:translateY(-1px); }
+
+/* ═══ ANIM KEYFRAMES ═══ */
+@keyframes up {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* Kanji shimmer sweep */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.hero-kanji {
+  background-size: 200% auto;
+  animation: up 1s ease .25s forwards, shimmer 5s linear 1.5s infinite;
+}
+
+/* Breathing glow on card border corners */
+@keyframes cornerPulse {
+  0%, 100% { opacity: .5; }
+  50%       { opacity: 1; }
+}
+.card::before, .card::after,
+.card .c2::before, .card .c2::after {
+  animation: cornerPulse 3s ease-in-out infinite;
+}
+.card::after   { animation-delay: .75s; }
+.card .c2::before { animation-delay: 1.5s; }
+.card .c2::after  { animation-delay: 2.25s; }
+
+/* Progress bar dot pulse */
+@keyframes dotPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74,127,212,.6); }
+  50%       { box-shadow: 0 0 0 5px rgba(74,127,212,0); }
+}
+.prog-bar::after {
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+/* Option hover shimmer fill */
+@keyframes shimFill {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+.opt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.04) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: none;
+  pointer-events: none;
+}
+.opt:hover::after { animation: shimFill .5s ease forwards; }
+
+/* Ripple on continue button click */
+@keyframes ripple {
+  from { transform: scale(0); opacity: .4; }
+  to   { transform: scale(3); opacity: 0; }
+}
+.btn-go .ripple {
+  position: absolute;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: rgba(90,144,228,.35);
+  transform: scale(0);
+  pointer-events: none;
+  animation: ripple .55s ease-out forwards;
+}
+
+/* Result role text reveal */
+@keyframes revealRole {
+  0%   { opacity:0; transform: translateY(20px) scale(.95); filter: blur(4px); }
+  100% { opacity:1; transform: translateY(0)   scale(1);   filter: blur(0); }
+}
+.res-role { animation: revealRole .8s cubic-bezier(.22,1,.36,1) .1s both; }
+
+/* Result desc line-by-line fade */
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.res-eye  { animation: fadeIn .6s ease .05s both; }
+.res-sub  { animation: fadeIn .6s ease .25s both; }
+.res-div  { animation: fadeIn .5s ease .35s both; }
+.res-desc { animation: fadeIn .7s ease .45s both; }
+
+/* Trait tags pop in one-by-one (set via JS) */
+@keyframes traitPop {
+  0%   { opacity:0; transform:scale(.8) translateY(6px); }
+  60%  { transform:scale(1.06) translateY(-2px); }
+  100% { opacity:1; transform:scale(1) translateY(0); }
+}
+.trait { opacity:0; }
+.trait.visible { animation: traitPop .4s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+/* Score bar row fade-slide */
+@keyframes rowIn {
+  from { opacity:0; transform:translateX(-8px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.srow { opacity:0; }
+.srow.visible { animation: rowIn .35s ease forwards; }
+
+/* Ink particle burst (canvas-driven, just the keyframe) */
+@keyframes floatUp {
+  0%   { opacity:.8; transform: translateY(0) scale(1); }
+  100% { opacity:0;  transform: translateY(-60px) scale(0); }
+}
+
+/* Result card shimmer border */
+@keyframes borderGlow {
+  0%, 100% { box-shadow: var(--shadow-res), 0 0 20px rgba(74,127,212,.08); }
+  50%       { box-shadow: var(--shadow-res), 0 0 40px rgba(74,127,212,.18); }
+}
+.res-card { animation: up .9s ease forwards, borderGlow 4s ease-in-out 1s infinite; }
+
+@media(max-width:500px){
+  .card,.res-card { padding:24px 18px 22px; }
+  .srow-name { width:100px; font-size:10px; }
+  .theme-toggle { top:14px; right:14px; padding:7px 10px; }
+}
+
+/* ═══ CURSOR ═══ */
+* { cursor: none !important; }
+#cursor-dot {
+  position: fixed;
+  width: 8px; height: 8px;
+  background: #7ab4e8;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width .15s, height .15s, background .2s, opacity .2s;
+  box-shadow: 0 0 6px rgba(122,180,232,.6);
+}
+#cursor-ring {
+  position: fixed;
+  width: 32px; height: 32px;
+  border: 1px solid rgba(122,180,232,.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width .25s cubic-bezier(.22,1,.36,1),
+              height .25s cubic-bezier(.22,1,.36,1),
+              border-color .25s,
+              opacity .25s;
+}
+#cursor-trail-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+}
+html.light #cursor-dot  { background: #8a6020; box-shadow: 0 0 6px rgba(138,96,32,.5); }
+html.light #cursor-ring { border-color: rgba(106,74,16,.4); }
+/* States */
+body.cursor-hover #cursor-dot  { width: 6px; height: 6px; background: #c8e0ff; }
+body.cursor-hover #cursor-ring { width: 44px; height: 44px; border-color: rgba(122,180,232,.7); }
+body.cursor-click #cursor-dot  { width: 12px; height: 12px; }
+body.cursor-click #cursor-ring { width: 22px; height: 22px; opacity: .4; }
+html.light body.cursor-hover #cursor-dot  { background: #1e1406; }
+html.light body.cursor-hover #cursor-ring { border-color: rgba(106,74,16,.7); }
+
+
+
+/* Gentle float on hero kanji */
+@keyframes floatKanji {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+.hero-kanji {
+  animation: up 1s ease .25s forwards, shimmer 5s linear 1.5s infinite, floatKanji 6s ease-in-out 1.5s infinite;
+}
+
+/* Card entrance: subtle scale-up from slightly smaller */
+@keyframes cardEntrance {
+  from { opacity:0; transform: translateY(22px) scale(.98); }
+  to   { opacity:1; transform: translateY(0) scale(1); }
+}
+.card.init { animation: cardEntrance .65s cubic-bezier(.22,1,.36,1) 1s forwards; }
+
+/* Ink-drop ripple on option select */
+@keyframes inkDrop {
+  0%   { transform: scale(0); opacity:.5; }
+  100% { transform: scale(2.8); opacity:0; }
+}
+.opt .ink-drop {
+  position: absolute;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(74,127,212,.22);
+  pointer-events: none;
+  transform: scale(0);
+  animation: inkDrop .55s ease-out forwards;
+}
+html.light .opt .ink-drop {
+  background: rgba(100,80,20,.14);
+}
+
+/* Subtle breathing glow on result card glow-line */
+@keyframes glowLinePulse {
+  0%, 100% { opacity: .7; }
+  50%       { opacity: 1; }
+}
+.res-card .glow-line {
+  animation: glowLinePulse 3s ease-in-out infinite;
+}
+
+/* Staggered trait tag pop — already done via JS, but add a gentle hover lift */
+.trait {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.trait:hover {
+  transform: translateY(-2px);
+}
+
+/* Progress bar fill pulse flash when question changes */
+@keyframes barFlash {
+  0%   { filter: brightness(1); }
+  40%  { filter: brightness(1.6); }
+  100% { filter: brightness(1); }
+}
+.prog-bar.flash { animation: barFlash .45s ease forwards; }
+
+/* Watermark slow spin */
+@keyframes wmSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.wm {
+  animation: wmSpin 40s linear infinite;
+  transform-origin: center center;
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="cursor-trail-canvas"></canvas>
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<button class="theme-toggle" id="theme-btn" aria-label="Toggle theme" onclick="toggleTheme()">
+  <span class="theme-toggle-icon" id="theme-icon">☽</span>
+  <span class="theme-toggle-label" id="theme-label">Light</span>
+</button>
+
+<div class="wrap">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Scroll of Inner Nature · Omegaverse</div>
+    <div class="hero-kanji">风云江湖</div>
+    <div class="hero-rule"><div class="hero-diamond"></div></div>
+    <h1 class="hero-h1">What Are You in the Jianghu?</h1>
+    <p class="hero-sub">Thirteen fates. One scroll. One truth.</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz">
+    <div class="prog">
+      <div class="prog-meta">
+        <span id="qc">Question 1 of 13</span>
+        <span id="qp">0%</span>
+      </div>
+      <div class="prog-track"><div class="prog-bar" id="pb"></div></div>
+    </div>
+    <div class="card" id="card">
+      <div class="c2"></div>
+      <span class="q-label" id="ql"></span>
+      <div class="q-text" id="qt"></div>
+      <div class="opts" id="opts"></div>
+      <div class="nav">
+        <button class="btn-go" id="pb2" onclick="prev()" style="display:none">← Back</button>
+        <button class="btn-go" id="nb" disabled onclick="nxt()">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="res-section">
+    <div class="res-card" id="rc">
+      <div class="rc2"></div>
+      <div class="glow-line" id="gl"></div>
+      <div class="glow-orb" id="go"></div>
+      <div class="res-eye">Your Nature in the Jianghu</div>
+      <div class="res-role" id="rr"></div>
+      <div class="res-sub"  id="rs"></div>
+      <div class="res-div"><div class="res-div-dot"></div></div>
+      <p class="res-desc"   id="rd"></p>
+      <div class="res-traits" id="rt"></div>
+      <div class="scores" id="sc"></div>
+      <div class="wm" id="wm"></div>
+      <button class="btn-again" onclick="restart()">↩ Take the Scroll Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── CANVAS STARFIELD ─── */
+(function(){
+  const cv = document.getElementById('bg-canvas');
+  const ctx = cv.getContext('2d');
+  let stars = [];
+
+  function resize(){
+    cv.width  = window.innerWidth;
+    cv.height = window.innerHeight;
+    stars = [];
+    for(let i=0;i<120;i++){
+      stars.push({
+        x: Math.random()*cv.width,
+        y: Math.random()*cv.height,
+        r: Math.random()*1.2+.2,
+        a: Math.random(),
+        da: (Math.random()*.008+.002)*(Math.random()<.5?1:-1),
+        lo: Math.random()*.08+.01,
+        hi: Math.random()*.5+.1,
+      });
+    }
+  }
+
+  function getStarColor(){
+    return getComputedStyle(document.documentElement).getPropertyValue('--star-color').trim() || '160,200,255';
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    const col = getStarColor();
+    stars.forEach(s=>{
+      s.a += s.da;
+      if(s.a>s.hi||s.a<s.lo) s.da*=-1;
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(${col},${s.a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+
+/* ─── THEME TOGGLE ─── */
+function toggleTheme(){
+  const isLight = document.documentElement.classList.toggle('light');
+  document.getElementById('theme-icon').textContent  = isLight ? '☀' : '☽';
+  document.getElementById('theme-label').textContent = isLight ? 'Dark' : 'Light';
+  try { localStorage.setItem('jianghu-theme', isLight ? 'light' : 'dark'); } catch(e){}
+}
+
+// Restore saved theme on load
+(function(){
+  try {
+    if(localStorage.getItem('jianghu-theme') === 'light'){
+      document.documentElement.classList.add('light');
+      // icons set after DOM ready
+      window.addEventListener('DOMContentLoaded', ()=>{
+        document.getElementById('theme-icon').textContent  = '☀';
+        document.getElementById('theme-label').textContent = 'Dark';
+      });
+    }
+  } catch(e){}
+})();
+
+/* ─── DIMENSION KEYS ─── */
+// AS=Assertiveness, IN=Independence, EO=EmotionalOpenness, CA=Caretaking
+// SO=Sociability, CO=ConflictStyle, RS=ReassuranceNeed, PL=Playfulness
+// Values accumulate; higher = more of the "high" pole described
+const DIMS = ['AS','IN','EO','CA','SO','CO','RS','PL'];
+
+const G = ['甲','乙','丙','丁'];
+const N = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三'];
+const K = ['DA','LA','SA','PA','SUA','CB','PB','FB','NB','SUO','STO','IO','AO'];
+
+/* ─── QUESTIONS ─── (each answer: map of dim -> delta) ─── */
+const Q = [
+  {t:"Someone challenges you to a fight in the market square. Your first instinct:",o:[
+    {t:"Step up immediately. You never back down — you make sure everyone knows it.",   d:{AS:2, CO:2, IN:1}},
+    {t:"Let them talk. You will end it when you choose, on your own terms.",            d:{AS:1, IN:2, CO:1}},
+    {t:"Look around nervously and hope someone steps in before you have to.",           d:{AS:-2, CO:-2, RS:1}},
+    {t:"Smile slowly. You have been waiting for an excuse like this.",                  d:{CO:2, EO:1, AS:1}}
+  ]},
+  {t:"A close friend is crying and won't tell you why. You:",o:[
+    {t:"Sit beside them in silence. Your presence is enough — no words needed.",        d:{CA:2, EO:1, CO:-1}},
+    {t:"Hold them and promise to fix whatever it is, even before you know what it is.", d:{CA:2, AS:1, EO:1}},
+    {t:"Make them laugh. Their tears make you uncomfortable but you hide it.",          d:{PL:2, SO:1, EO:-1}},
+    {t:"Cry a little too, because their pain immediately becomes yours.",               d:{EO:2, RS:1, CA:1}}
+  ]},
+  {t:"How do you feel about asking for help?",o:[
+    {t:"Never. You would rather struggle alone than owe anyone anything.",              d:{IN:2, AS:1, RS:-2}},
+    {t:"Completely fine — asking is strategic, not weak.",                             d:{IN:1, AS:1, RS:-1}},
+    {t:"You hate it, but you do it when you have absolutely no other choice.",          d:{IN:1, EO:-1, RS:-1}},
+    {t:"You ask often. You simply feel better with someone nearby.",                   d:{RS:2, EO:1, IN:-1}}
+  ]},
+  {t:"The person you love is in danger. You:",o:[
+    {t:"Rush in without thinking. You will figure out the details while moving.",       d:{AS:2, CO:2, CA:1}},
+    {t:"Put yourself between them and the threat without a second of hesitation.",      d:{CA:2, AS:1, CO:1}},
+    {t:"Freeze for a heartbeat, then force yourself to move anyway.",                  d:{CO:-1, RS:1, EO:1}},
+    {t:"Handle everything alone and never tell them how terrified you were.",           d:{IN:2, EO:-2, AS:1}}
+  ]},
+  {t:"At a great sect gathering, where are you found?",o:[
+    {t:"At the center — commanding the room effortlessly, without trying.",             d:{AS:2, SO:2, IN:1}},
+    {t:"On the edge, watching. You do not need the crowd, and the crowd knows it.",     d:{IN:2, SO:-2, AS:1}},
+    {t:"Making the rounds — everyone knows you, everyone is glad you came.",            d:{SO:2, PL:1, EO:1}},
+    {t:"Close to one trusted person, not straying far from their side.",               d:{RS:2, SO:-1, CA:1}}
+  ]},
+  {t:"Someone tells you that you are too soft. You:",o:[
+    {t:"Shrug. Being soft is not the same as being weak. You know the difference.",     d:{IN:1, AS:1, EO:1}},
+    {t:"Feel stung, say nothing, and carry it home with you all night.",               d:{EO:-1, RS:1, CO:-2}},
+    {t:"Laugh. Let them think that — it is actually quite useful.",                    d:{AS:1, PL:2, IN:1}},
+    {t:"Agree quietly. Maybe they are right.",                                         d:{AS:-2, RS:1, CO:-1}}
+  ]},
+  {t:"Your sect master gives an order you deeply disagree with. You:",o:[
+    {t:"Comply publicly, then do what you know is right when no one watches.",          d:{AS:1, IN:2, CO:1}},
+    {t:"Follow without question. It is not your place to object.",                     d:{CO:-2, AS:-1, RS:1}},
+    {t:"Follow, but write down exactly how you feel about it that night.",              d:{EO:2, CO:-1, RS:1}},
+    {t:"Voice your disagreement once, calmly, then let it go entirely.",               d:{AS:1, CO:1, IN:1}}
+  ]},
+  {t:"How do you handle long stretches of solitude?",o:[
+    {t:"You prefer it. People exhaust you in ways they would never understand.",        d:{IN:2, SO:-2, RS:-1}},
+    {t:"Fine at first, then you begin composing messages you never send.",              d:{RS:2, EO:1, SO:-1}},
+    {t:"You thrive. Solitude is where your best thinking happens.",                    d:{IN:2, SO:-1, AS:1}},
+    {t:"You fall apart quietly, then rebuild yourself before anyone notices.",          d:{EO:-1, IN:1, RS:1}}
+  ]},
+  {t:"The person you love says they need space. You:",o:[
+    {t:"Give it immediately — even if it quietly destroys you inside.",                d:{IN:1, EO:-1, CO:-1}},
+    {t:"Give it, but check in more often than they asked you to.",                     d:{RS:2, CA:1, EO:1}},
+    {t:"Respect it completely. You understand the need better than most.",             d:{IN:2, RS:-1, CO:1}},
+    {t:"Try to respect it — but end up showing up anyway, just to see their face.",    d:{RS:1, CA:2, EO:1}}
+  ]},
+  {t:"A stranger is being publicly insulted right in front of you. You:",o:[
+    {t:"Step in immediately. You cannot just stand there and watch.",                  d:{CA:2, AS:1, CO:2}},
+    {t:"Make one sharp remark that shuts it down without raising your voice.",         d:{CO:2, AS:1, PL:1}},
+    {t:"Glare. You want to speak but the words won't come when you need them.",        d:{EO:1, CO:-1, RS:1}},
+    {t:"Walk away. Not your fight, not your problem.",                                 d:{IN:2, CO:-1, SO:-1}}
+  ]},
+  {t:"What do people come to you for?",o:[
+    {t:"Direction. When things collapse, they look to you first.",                     d:{AS:2, CO:1, CA:1}},
+    {t:"Comfort. You are the one with warm tea and an open door.",                     d:{CA:2, EO:1, SO:1}},
+    {t:"Lightness. You make everything easier just by being present.",                 d:{PL:2, SO:2, EO:1}},
+    {t:"Honestly, you are not sure. You wish they came more often.",                   d:{RS:2, EO:1, AS:-1}}
+  ]},
+  {t:"Someone says \"I love you\" to you first. You:",o:[
+    {t:"You have been waiting to say it too — it floods out of you.",                  d:{EO:2, CA:1, RS:1}},
+    {t:"Freeze. Then say it back slowly, like you are tasting the words.",             d:{EO:-1, IN:1, RS:-1}},
+    {t:"Say it back easily. You have known for a while now.",                          d:{IN:1, EO:1, AS:1}},
+    {t:"Burst into tears and cannot explain why to save your life.",                   d:{EO:2, RS:2, AS:-1}}
+  ]},
+  {t:"Which line sounds most like something you would say?",o:[
+    {t:"\"I do not lose. I simply have not finished yet.\"",                           d:{AS:2, CO:2, IN:1}},
+    {t:"\"You do not have to carry that alone anymore.\"",                             d:{CA:2, EO:1, SO:1}},
+    {t:"\"I am fine. I am always fine.\"",                                             d:{EO:-2, IN:1, CO:-1}},
+    {t:"\"Do you think they even noticed I was there?\"",                              d:{RS:2, EO:1, AS:-2}}
+  ]}
+];
+
+/* ─── ARCHETYPE PROFILES ─── */
+// Each archetype is defined as a vector over DIMS [AS, IN, EO, CA, SO, CO, RS, PL]
+// Values: -2 (strongly low), -1 (low), 0 (neutral), 1 (high), 2 (strongly high)
+const PROFILES = {
+  //        AS   IN   EO   CA   SO   CO   RS   PL
+  DA:  {AS: 2, IN: 1, EO: 0, CA: 1, SO: 1, CO: 2, RS:-1, PL: 0},
+  LA:  {AS: 2, IN: 2, EO:-1, CA: 0, SO:-2, CO: 0, RS:-2, PL:-1},
+  SA:  {AS: 1, IN: 0, EO: 2, CA: 2, SO: 1, CO:-1, RS: 0, PL: 0},
+  PA:  {AS: 0, IN:-1, EO: 2, CA: 0, SO: 0, CO:-1, RS: 2, PL: 1},
+  SUA: {AS: 1, IN: 0, EO: 1, CA: 1, SO: 0, CO:-1, RS: 1, PL:-1},
+  CB:  {AS: 0, IN: 0, EO: 1, CA: 2, SO: 1, CO:-1, RS: 0, PL: 0},
+  PB:  {AS: 1, IN: 1, EO: 0, CA: 2, SO: 0, CO: 1, RS:-1, PL:-1},
+  FB:  {AS: 0, IN: 0, EO: 2, CA: 0, SO: 2, CO: 0, RS: 1, PL: 2},
+  NB:  {AS:-1, IN:-1, EO: 2, CA: 1, SO: 1, CO:-1, RS: 2, PL: 0},
+  SUO: {AS:-1, IN:-1, EO: 2, CA: 1, SO: 0, CO:-2, RS: 1, PL: 0},
+  STO: {AS: 0, IN: 2, EO:-2, CA: 1, SO:-1, CO: 0, RS:-1, PL:-1},
+  IO:  {AS: 1, IN: 2, EO: 0, CA: 0, SO:-1, CO: 1, RS:-1, PL: 0},
+  AO:  {AS: 2, IN: 0, EO: 1, CA:-1, SO: 0, CO: 2, RS: 0, PL: 1}
+};
+
+const R = {
+  DA:  {role:'Dominant Alpha',    base:'alpha',mark:'主',sub:'支配者 · The One Who Commands',
+        desc:'You do not ask for authority — you simply have it. People look to you before they even realize they are doing it. You are decisive, magnetic, and occasionally terrifying, but those who earn your trust get something rare: the version of you that is gentle, that worries quietly, that would burn the world down for the people it loves.',
+        traits:['Commanding','Magnetic','Decisive','Fiercely Protective','Secretly Tender']},
+  LA:  {role:'Loner Alpha',       base:'alpha',mark:'孤',sub:'孤狼者 · The One Who Walks Alone',
+        desc:'You carry Alpha strength and none of the hunger for an audience. The Jianghu knows your name but not your face — you prefer it that way. When someone finally gets through your walls, they discover something worth the long wait: a loyalty so fierce and quiet it could outlast dynasties.',
+        traits:['Self-Sufficient','Guarded','Observant','Fiercely Loyal','Quietly Powerful']},
+  SA:  {role:'Soft Alpha',        base:'alpha',mark:'柔',sub:'温柔者 · The One With Gentle Hands',
+        desc:'You have all the strength of an Alpha and none of the sharpness. You lead with warmth instead of force, and people follow not out of fear but because being near you feels like safety. You fall hard and love openly — and softness is not a crack in your armor. It is the armor.',
+        traits:['Warm','Affectionate','Protective','Open-Hearted','Quietly Strong']},
+  PA:  {role:'Pathetic Alpha',    base:'alpha',mark:'憐',sub:'车转者 · The One Who Tries Too Hard',
+        desc:'You carry the title of Alpha and spend most of your time wondering if you truly deserve it. You are lovable in the most embarrassing way — earnest, a little desperate, always afraid you are too much or not enough. Your vulnerability is not weakness. It is you, unfiltered — and that is rarer than any sword technique.',
+        traits:['Earnest','Self-Doubting','Trying His Best','Lovably Chaotic','Surprisingly Resilient']},
+  SUA: {role:'Submissive Alpha',  base:'alpha',mark:'让',sub:'赏识者 · The One Who Yields',
+        desc:'You carry Alpha strength but wear it lightly. You know when to lead and when to step back — and that wisdom makes you more formidable than most. You choose your battles carefully, defer to those you trust, and in quiet moments you are the one holding everything together while no one is watching.',
+        traits:['Controlled','Perceptive','Quietly Strong','Deferential','Deeply Trustworthy']},
+  CB:  {role:'Caring Beta',       base:'beta', mark:'暖',sub:'愈者 · The One Who Stays',
+        desc:'You are the warm light in every cold room. People find you and immediately exhale. You remember the small things — who cries alone, who needs someone to say "I see you." You give without keeping score. You are not the backup plan. You are the reason everything holds together.',
+        traits:['Warm','Attentive','Selfless','Steady','The One Everyone Needs']},
+  PB:  {role:'Protective Beta',   base:'beta', mark:'护',sub:'守护者 · The One Who Stands Between',
+        desc:'You are not the loudest in the room, but you are always the first one standing in front of someone when things go wrong. Your protection is quiet and absolute. People call you when they are frightened — not because you are the strongest, but because nothing feels like it can reach them while you are there.',
+        traits:['Steadfast','Reliable','Alert','Self-Sacrificing','Quietly Formidable']},
+  FB:  {role:'Flirty Beta',       base:'beta', mark:'风',sub:'风流者 · The One Who Charms',
+        desc:'You move through the Jianghu like wind — easy, warm, impossible to hold. Everyone smiles when you arrive, and very few know who you truly are beneath the charm. When you let someone past the easy smile, they find someone unexpectedly deep, and they never quite recover.',
+        traits:['Charming','Quick-Witted','Socially Fluid','Secretly Serious','Warmly Unpredictable']},
+  NB:  {role:'Needy Beta',        base:'beta', mark:'依',sub:'依靠者 · The One Who Reaches',
+        desc:'You love deeply and need to be loved back in equal measure — there is nothing wrong with that. You are the one who checks in, who sends a message just to say "I was thinking of you." The person who stays in your overflow gets someone who will never let them feel alone a day in their life.',
+        traits:['Affectionate','Attentive','Emotionally Open','Devoted','Tender to a Fault']},
+  SUO: {role:'Submissive Omega',  base:'omega',mark:'顺',sub:'顺从者 · The One Who Follows',
+        desc:'You feel everything and you let it show. In a world that rewards hardness, you are unapologetically soft — and that softness is not passivity, it is trust. You give yourself to the people who earn it, fully and without reservation. You are the reason the charge is worth making.',
+        traits:['Soft-Hearted','Trusting','Emotionally Present','Devoted','Achingly Sincere']},
+  STO: {role:'Stoic Omega',       base:'omega',mark:'忍',sub:'峙静者 · The One Who Endures',
+        desc:'You feel everything and show almost none of it. You carry grief the way rivers carry stones — silently, and for a very long time. Beneath the composure is someone who loves with devastating depth, who holds on long after others let go, and who will finally, one day, let someone see all of it.',
+        traits:['Composed','Deeply Feeling','Enduring','Slow to Trust','Quietly Overwhelming']},
+  IO:  {role:'Independent Omega', base:'omega',mark:'自',sub:'自由者 · The One Who Needs No One',
+        desc:'You are an Omega who does not wait to be chosen — you choose. You are self-possessed, clear-headed, and fully capable of walking any road alone. What you want is not someone to complete you. You are already complete. What you want is someone worth slowing down for.',
+        traits:['Self-Possessed','Clear-Headed','Unapologetically Free','Selective','Quietly Magnetic']},
+  AO:  {role:'Aggressive Omega',  base:'omega',mark:'逆',sub:'逆走者 · The One Who Defies',
+        desc:'You are the Omega nobody saw coming. Fierce, sharp-tongued, and deeply finished with being underestimated. Beneath the aggression is someone who feels everything at full volume and has simply learned to aim it outward. The person who earns your trust gets both — the fire and the ache underneath it.',
+        traits:['Fierce','Sharp','Defiant','Secretly Soft','Impossible to Ignore']}
+};
+
+const COL = {alpha:'#c44a4a', beta:'#4a7fd4', omega:'#9a5fd4'};
+
+/* ─── STATE ─── */
+let cur = 0;
+let dims = {};   // accumulated dimension scores from answers
+DIMS.forEach(d => dims[d] = 0);
+let sel = null;  // currently selected answer delta-map
+let history = []; // stores {delta} for each answered question
+
+/* ─── SCORING ─── */
+function computeScores() {
+  // For each archetype, compute dot-product similarity between
+  // user's dimension vector and archetype's profile vector
+  const scores = {};
+  K.forEach(k => {
+    const p = PROFILES[k];
+    let dot = 0;
+    DIMS.forEach(d => { dot += (dims[d] || 0) * (p[d] || 0); });
+    scores[k] = dot;
+  });
+  return scores;
+}
+
+function render(isFirst){
+  const q=Q[cur], pct=Math.round(((cur+1)/Q.length)*100);
+  document.getElementById('qc').textContent=`Question ${cur+1} of ${Q.length}`;
+  document.getElementById('qp').textContent=pct+'%';
+  const pb = document.getElementById('pb');
+  pb.style.width=pct+'%';
+  pb.classList.remove('flash');
+  void pb.offsetWidth;
+  pb.classList.add('flash');
+  document.getElementById('ql').textContent=`— ${N[cur]} —`;
+  document.getElementById('qt').textContent=q.t;
+
+  const box=document.getElementById('opts');
+  box.innerHTML='';
+  q.o.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.style.opacity='0';
+    b.style.transform='translateY(10px)';
+    b.style.transition=`opacity .25s ease ${i*.07}s,transform .25s ease ${i*.07}s,border-color .2s,color .2s`;
+    const g=document.createElement('span'); g.className='opt-g'; g.textContent=G[i];
+    const t=document.createElement('span'); t.className='opt-t'; t.textContent=o.t;
+    b.appendChild(g); b.appendChild(t);
+    b.onclick=(e)=>pick(b, o.d, e);
+    box.appendChild(b);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      b.style.opacity='1'; b.style.transform='translateY(0)';
+    }));
+  });
+  document.getElementById('pb2').style.display = cur > 0 ? 'inline-flex' : 'none';
+  document.getElementById('nb').disabled = true;
+  sel = null;
+
+  // Restore previous selection for this question if navigating back
+  if(history[cur]){
+    sel = history[cur].delta;
+    const q = Q[cur];
+    q.o.forEach((o, i) => {
+      if(o.d === sel){
+        setTimeout(()=>{
+          const opts = document.querySelectorAll('.opt');
+          if(opts[i]) opts[i].classList.add('sel');
+          document.getElementById('nb').disabled = false;
+        }, 300);
+      }
+    });
+  }
+
+  if(isFirst){
+    const card=document.getElementById('card');
+    card.classList.add('init');
+    card.addEventListener('animationend', ()=>{
+      card.classList.remove('init');
+      card.style.opacity='1';
+      card.style.transform='translateY(0)';
+    }, {once:true});
+  }
+}
+
+function pick(el, delta, e){
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  sel = delta;
+  document.getElementById('nb').disabled=false;
+  // ink-drop ripple
+  const rect = el.getBoundingClientRect();
+  const drop = document.createElement('span');
+  drop.className = 'ink-drop';
+  const ox = (e && e.clientX) ? e.clientX - rect.left - 20 : rect.width/2 - 20;
+  const oy = (e && e.clientY) ? e.clientY - rect.top  - 20 : rect.height/2 - 20;
+  drop.style.left = ox + 'px';
+  drop.style.top  = oy + 'px';
+  el.appendChild(drop);
+  drop.addEventListener('animationend', ()=>drop.remove());
+}
+
+function prev(){
+  if(cur <= 0) return;
+  // Undo the last answer's dims if it was committed
+  if(history[cur - 1]){
+    Object.entries(history[cur - 1].delta).forEach(([d,v]) => { dims[d] = (dims[d]||0) - v; });
+  }
+  cur--;
+  const card = document.getElementById('card');
+  card.style.transition = 'opacity .22s ease, transform .22s ease';
+  card.style.opacity = '0';
+  card.style.transform = 'translateX(22px)';
+  setTimeout(()=>{
+    render();
+    card.style.transition = 'none';
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(-22px)';
+    void card.offsetWidth;
+    card.style.transition = 'opacity .3s ease, transform .3s ease';
+    card.style.opacity = '1';
+    card.style.transform = 'translateX(0)';
+  }, 230);
+}
+function nxt(){
+  if(!sel) return;
+  // Save this answer to history (overwrite if going back then forward)
+  history[cur] = { delta: sel };
+  // Apply dimension deltas from chosen answer
+  Object.entries(sel).forEach(([d,v]) => { dims[d] = (dims[d]||0) + v; });
+  cur++;
+  if(cur>=Q.length){ showRes(); return; }
+  const card=document.getElementById('card');
+  // Slide out
+  card.style.transition='opacity .22s ease, transform .22s ease';
+  card.style.opacity='0';
+  card.style.transform='translateX(-22px)';
+  setTimeout(()=>{
+    render();
+    // Prepare incoming state without transition so it doesn't flash
+    card.style.transition='none';
+    card.style.opacity='0';
+    card.style.transform='translateX(22px)';
+    // Force reflow then animate in
+    void card.offsetWidth;
+    card.style.transition='opacity .3s ease, transform .3s ease';
+    card.style.opacity='1';
+    card.style.transform='translateX(0)';
+  },240);
+}
+
+function showRes(){
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('res-section').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  const scores = computeScores();
+
+  // Find winner (highest dot-product score); break ties randomly
+  let max = -Infinity;
+  K.forEach(k=>{ if(scores[k]>max) max=scores[k]; });
+  const tied = K.filter(k=>scores[k]===max);
+  const w = tied[Math.floor(Math.random()*tied.length)];
+  const d = R[w];
+  const c = COL[d.base];
+
+  const card=document.getElementById('rc');
+  card.className='res-card '+d.base;
+
+  document.getElementById('gl').style.background=c;
+  document.getElementById('gl').style.boxShadow=`0 0 20px ${c}`;
+  document.getElementById('go').style.background=`radial-gradient(ellipse, ${c}33 0%, transparent 70%)`;
+
+  const rr=document.getElementById('rr');
+  rr.textContent=d.role; rr.className='res-role '+d.base;
+  document.getElementById('rs').textContent=d.sub;
+  document.getElementById('rd').textContent=d.desc;
+  document.getElementById('wm').textContent=d.mark;
+
+  const tr=document.getElementById('rt');
+  tr.innerHTML='';
+  d.traits.forEach((t,i)=>{
+    const s=document.createElement('span');
+    s.className='trait';
+    s.textContent=t;
+    tr.appendChild(s);
+    setTimeout(()=>s.classList.add('visible'), 600 + i*80);
+  });
+
+  // Score bars — show relative affinity across archetypes
+  const sb=document.getElementById('sc');
+  sb.innerHTML='';
+  const st=document.createElement('div');st.className='scores-title';st.textContent='Resonance Across All Fates';sb.appendChild(st);
+
+  // Normalize scores to 0–100 for display
+  const vals = K.map(k=>scores[k]);
+  const minV = Math.min(...vals);
+  const maxV = Math.max(...vals);
+  const range = maxV - minV || 1;
+
+  const sorted = [...K].sort((a,b)=>scores[b]-scores[a]);
+  sorted.forEach(k=>{
+    const pct = Math.round(((scores[k]-minV)/range)*100);
+    const row=document.createElement('div');row.className='srow';
+    const nm=document.createElement('span');nm.className='srow-name';nm.textContent=R[k].role;
+    const trk=document.createElement('div');trk.className='srow-track';
+    const bar=document.createElement('div');bar.className='srow-bar';
+    bar.style.background=COL[R[k].base];
+    bar.style.opacity=k===w?'1':'.3';
+    bar.style.width='0%';
+    trk.appendChild(bar);
+    const vl=document.createElement('span');vl.className='srow-val';vl.textContent=pct+'%';
+    row.appendChild(nm);row.appendChild(trk);row.appendChild(vl);
+    sb.appendChild(row);
+    setTimeout(()=>{
+      row.classList.add('visible');
+      bar.style.width=pct+'%';
+    },200 + sorted.indexOf(k)*60);
+  });
+}
+
+function restart(){
+  cur=0; sel=null;
+  DIMS.forEach(d=>dims[d]=0);
+  document.getElementById('res-section').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  const card=document.getElementById('card');
+  card.style.transition='none';
+  card.style.opacity='0';
+  card.style.transform='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  render(true);
+}
+
+window.addEventListener('load',()=>render(true));
+
+/* ─── CUSTOM CURSOR ─── */
+(function(){
+  const dot   = document.getElementById('cursor-dot');
+  const ring  = document.getElementById('cursor-ring');
+  const tc    = document.getElementById('cursor-trail-canvas');
+  const tctx  = tc.getContext('2d');
+
+  let mx = -200, my = -200;
+  let rx = -200, ry = -200;
+  let particles = [];
+  let lastX = -200, lastY = -200;
+  let raf;
+
+  function resize(){
+    tc.width  = window.innerWidth;
+    tc.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  /* Ring lerps toward dot with easing */
+  function lerp(a,b,t){ return a + (b-a)*t; }
+
+  function addParticle(x, y){
+    const isLight = document.documentElement.classList.contains('light');
+    const hues = isLight
+      ? ['rgba(106,74,16,', 'rgba(154,120,50,', 'rgba(80,55,10,']
+      : ['rgba(122,180,232,', 'rgba(74,127,212,', 'rgba(200,224,255,'];
+    const col = hues[Math.floor(Math.random()*hues.length)];
+    particles.push({
+      x, y,
+      vx: (Math.random()-.5)*1.2,
+      vy: (Math.random()-.5)*1.2 - .4,
+      r:  Math.random()*2.5 + .5,
+      a:  Math.random()*.55 + .15,
+      col,
+      life: 1,
+      decay: Math.random()*.04 + .025
+    });
+  }
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left  = mx + 'px';
+    dot.style.top   = my + 'px';
+    /* Spawn trail particles when moving */
+    const dx = mx - lastX, dy = my - lastY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if(dist > 8){
+      for(let i=0; i<2; i++) addParticle(mx, my);
+      lastX = mx; lastY = my;
+    }
+  });
+
+  document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+  document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
+
+  /* Hover state for interactive elements */
+  const hoverSel = 'button, a, label, .opt, .theme-toggle, .btn-go, .btn-again';
+  document.addEventListener('mouseover', e => {
+    if(e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
+  });
+  document.addEventListener('mouseout', e => {
+    if(e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
+  });
+
+  function tick(){
+    /* Lerp ring */
+    rx = lerp(rx, mx, .12);
+    ry = lerp(ry, my, .12);
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+
+    /* Draw trail */
+    tctx.clearRect(0,0,tc.width,tc.height);
+    particles = particles.filter(p=>p.life>0);
+    particles.forEach(p=>{
+      p.x += p.vx; p.y += p.vy;
+      p.vy -= .02;
+      p.life -= p.decay;
+      tctx.beginPath();
+      tctx.arc(p.x, p.y, Math.max(0, p.r * p.life), 0, Math.PI*2);
+      tctx.fillStyle = p.col + (p.a * p.life).toFixed(2) + ')';
+      tctx.fill();
+    });
+
+    raf = requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>
